@@ -1,0 +1,59 @@
+<div id="profileContent" class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+                <div class="card-body">
+                    <div class="card-title mb-4">
+                        <div class="d-flex justify-content-start">
+                            <div class="image-container">
+                                <img src="http://placehold.it/150x150" id="imgProfile" style="width: 150px; height: 150px" class="img-thumbnail" />
+                                <div class="middle">
+                                    <input type="file" style="display: none;" id="profilePicture" name="file" />
+                                </div>
+                            </div>
+                            <div class="userData ml-3">
+                                <h2 id="username" class="d-block" style="font-size: 1.5rem; font-weight: bold"></h2>
+                                <h6 id="email" class="d-block"></h6>
+                                <h6 id="password" class="d-block"></h6>
+                            </div>
+                            <div class="ml-auto">
+                                <input type="button" class="btn btn-primary d-none" id="btnLogout" value="Log Out" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="text" id="startIndex" placeholder="Start Index">
+                    <input type="text" id="endIndex" placeholder="End Index">
+                    <input type="text" id="color" placeholder="Color">
+                    <input id="commandBtn" type="button" value="Send Command">
+                    <br>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div>
+                                
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li role="presentation" class="active"><a href="#createdConfigs" aria-controls="createdConfigs" role="tab" data-toggle="tab">Created Configs</a></li>
+                                    <li role="presentation"><a href="#savedConfigs" aria-controls="savedConfigs" role="tab" data-toggle="tab">SavedConfigs</a></li>
+                                </ul>
+                             
+                                <!-- Tab panes -->
+                                <div class="tab-content">
+                                    <div role="tabpanel" class="tab-pane active" id="createdConfigs">
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane" id="savedConfigs">
+                                    </div>
+                                </div>
+                             
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
