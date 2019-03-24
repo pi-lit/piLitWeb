@@ -1,0 +1,48 @@
+<html lang="en">
+	<head>
+		<title>Pi-Lit!</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script
+		  src="https://code.jquery.com/jquery-3.2.1.min.js"
+		  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+		  crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="stylesheets/style.css">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.dev.js"></script>
+		<script src="javascripts/events.js"></script>
+	</head>
+
+	<body>
+		<div id="mainContent">
+			<div class="wrapper fadeInDown">
+				<div id="formContent">
+			    <!-- Tabs Titles -->
+
+			    <!-- Icon -->
+					<div class="fadeIn first">
+			      		<h1>Welcome to Pi-Lit</h1>
+			    	</div>
+
+			    <!-- Login Form -->
+			    	<form id='loginForm'>
+			      		<input type="text" id="username" class="fadeIn second" name="login" placeholder="User Name">
+			      		<input type="text" id="password" class="fadeIn third" name="login" placeholder="Password">
+			     		<input id="loginBtn" type="button" class="fadeIn fourth" value="Log In">
+			     		<br>
+			     		<p id="errormsg"></p>
+			    	</form>
+
+			    <!-- Remind Passowrd -->
+			    	<form id="formFooter">
+			    		<a id='registerDir' class="underlineHover">Register</a>
+			    	</form>
+			    </div>
+			</div>
+		</div>
+	</body>
+</html>
