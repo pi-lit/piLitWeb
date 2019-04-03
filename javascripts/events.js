@@ -11,7 +11,7 @@ $(function() {
 				document.getElementById('errormsg').innerHTML = user.error;
 			} else {
 				console.log(user);
-				$('#mainContent').load("../partials/profile.html", function() {
+				$('#mainContent').load("/partials/profile.html", function() {
 
 					//Populate user info
 					document.getElementById('username').innerHTML = user.user;
@@ -48,7 +48,7 @@ $(function() {
 				document.getElementById('errormsg').innerHTML = user.error;
 			} else {
 				console.log(user);
-				$('#mainContent').load("../partials/profile.html", function() {
+				$('#mainContent').load("/partials/profile.html", function() {
 
 					//Populate user info
 					document.getElementById('username').innerHTML = user.user;
@@ -95,7 +95,7 @@ $(function() {
 
 	//Load registration page
 	$('#registerDir').click(function(){
-		$('#mainContent').load("../partials/register.html", function() {
+		$('#mainContent').load("/partials/register.html", function() {
 			document.getElementById("registerBtn").onclick = function() {
 				socket.emit('register', {
 					'userName': $('#username').val(),
