@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="style/myStyle.css" rel="stylesheet" type="text/css" />
+        <script src="js/js.js"></script>
+                <!-- add scripts -->
+                
+                <!-- color wheel -->
+        <script src="js/jquery.js"></script>
+        <script src="js/script.js"></script>
+        <link href="css/main.css" rel="stylesheet" type="text/css" />
+    </head>
+   
+    <body>
+        <div class="scrollmenu"></div>
+        
+        
+        <!-- preview element -->
+<div class="preview"></div>
+
+<!-- colorpicker element -->
+    <div class="colorpicker" style="display:none">
+      <canvas id="picker" var="5" width="300" height="300"></canvas>
+
+      <div class="controls">
+            <div><label>R</label> <input type="text" id="rVal" /></div>
+            <div><label>G</label> <input type="text" id="gVal" /></div>
+            <div><label>B</label> <input type="text" id="bVal" /></div>
+            <div><label>RGB</label> <input type="text" id="rgbVal" /></div>
+            <div><label>HEX</label> <input type="text" id="hexVal" /></div>
+            <div><label>Time</label> <input type="text" id="time" /></div>
+        </div>
+    </div>
+
+        
+        <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+        
+  
+  <script>
+            
+            function build(){
+                 var i = 1;
+                   while(i<31){
+                    $(".scrollmenu").append($("<a class = 'bulbs' id = '" + i + "'>"+ i + "</a>"));
+          
+          /*var div =  "<div class='preview'></div>";
+          div +=   "<div class='colorpicker' style='display:none'>";
+          div += "<canvas id='picker' var='5' width='300' height='300'></canvas>";
+          div +=  "<div class='controls'>";
+          div +=  "<div><label>R</label> <input type='text' id='rVal' /></div>";
+          div += "<div><label>G</label> <input type='text' id='gVal' /></div>";
+          div +=  "<div><label>B</label> <input type='text' id='bVal' /></div>";
+          div +=  "<div><label>RGB</label> <input type='text' id='rgbVal' /></div>";
+          div +=  "<div><label>HEX</label> <input type='text' id='hexVal' /></div>";
+          div +=  "</div></div>"; 
+                    $("preview").after($(div)); */
+                    i++;
+                    }
+    
+                }
+                build();
+    
+        </script>
+    </body>
+    
+</html>
