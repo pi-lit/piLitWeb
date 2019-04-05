@@ -16,6 +16,14 @@ $(function(){
     var canvas = document.getElementById('picker');
     var ctx = canvas.getContext('2d');
     var id;
+    var strip = [];
+    for(var i = 1; i<31;i++){
+        var light = {};
+        light.color = [];
+        light.time = 0;
+        strip[i] = light;   
+    }
+    console.log(strip);
     // drawing active image
     var image = new Image();
     image.onload = function () {
@@ -55,12 +63,15 @@ $(function(){
             var pixelColor = "rgb("+pixel[0]+", "+pixel[1]+", "+pixel[2]+")";
             console.log(id);
             $('#'+id).css('background-color', pixelColor);
-
+            strip[id].color = [pixel[0],pixel[1],pixel[2]];
             // update controls
             $('#rVal').val(pixel[0]);
             $('#gVal').val(pixel[1]);
             $('#bVal').val(pixel[2]);
             $('#rgbVal').val(pixel[0]+','+pixel[1]+','+pixel[2]);
+            if($('#time').val !== undefined){
+             strip[id].time = $('#time').val();
+            }
 
             var dColor = pixel[2] + 256 * pixel[1] + 65536 * pixel[0];
             $('#hexVal').val('#' + ('0000' + dColor.toString(16)).substr(-6));
@@ -74,5 +85,7 @@ $(function(){
         id = this.id;
         console.log(id);
         bCanPreview = true;
+        $('#time').val(0);
+        console.log(strip);
     });
 });

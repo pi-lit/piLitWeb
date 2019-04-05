@@ -36,6 +36,7 @@ and open the template in the editor.
             <div><label>B</label> <input type="text" id="bVal" /></div>
             <div><label>RGB</label> <input type="text" id="rgbVal" /></div>
             <div><label>HEX</label> <input type="text" id="hexVal" /></div>
+            <div><label>Time</label> <input type="text" id="time" /></div>
         </div>
     </div>
 
@@ -51,7 +52,7 @@ and open the template in the editor.
             function build(){
                  var i = 1;
                    while(i<31){
-                    $(".scrollmenu").append($("<a class = 'bulbs' id = 'bulb" + i + "'>"+ i + "</a>"));
+                    $(".scrollmenu").append($("<a class = 'bulbs' id = '" + i + "'>"+ i + "</a>"));
           
           /*var div =  "<div class='preview'></div>";
           div +=   "<div class='colorpicker' style='display:none'>";
