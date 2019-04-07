@@ -23,37 +23,62 @@
                         </div>
                     </div>
 
+                    <!--
                     <input type="text" id="startIndex" placeholder="Start Index">
                     <input type="text" id="endIndex" placeholder="End Index">
                     <input type="text" id="color" placeholder="Color">
                     <input id="commandBtn" type="button" value="Send Command">
                     <br>
+                    -->
 
                     <div class="row">
                         <div class="col-12">
                             <div>
-                                
+
+
                                 <ul class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active"><a href="#createdConfigs" aria-controls="createdConfigs" role="tab" data-toggle="tab">Created Configs</a></li>
-                                    <li role="presentation"><a href="#savedConfigs" aria-controls="savedConfigs" role="tab" data-toggle="tab">SavedConfigs</a></li>
+                                    <li role="presentation" class="active"><a href="#piList" aria-controls="piList" role="tab" data-toggle="tab">Device List</a></li>
+                                    <li role="presentation"><a href="#createdConfigs" aria-controls="createdConfigs" role="tab" data-toggle="tab">Created Configs</a></li>
+                                    <li role="presentation"><a href="#savedConfigs" aria-controls="savedConfigs" role="tab" data-toggle="tab">Saved Configs</a></li>
                                 </ul>
-                             
+
                                 <!-- Tab panes -->
                                 <div class="tab-content">
-                                    <div role="tabpanel" class="tab-pane active" id="createdConfigs">
+                                    <div class="tab-pane active" id="piList">
                                     </div>
-                                    <div role="tabpanel" class="tab-pane" id="savedConfigs">
+                                    <div class="tab-pane" id="createdConfigs">
+                                    </div>
+                                    <div class="tab-pane" id="savedConfigs">
                                     </div>
                                 </div>
-                             
+
                             </div>
                         </div>
                     </div>
-
 
                 </div>
 
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal" id="editConfigModal" tabindex="-1" role="dialog" aria-labelledby="editConfigModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editConfigModalLabel">Edit Configuration</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div>
