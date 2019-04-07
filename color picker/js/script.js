@@ -63,7 +63,7 @@ $(function(){
             var pixelColor = "rgb("+pixel[0]+", "+pixel[1]+", "+pixel[2]+")";
             console.log(id);
             $('#'+id).css('background-color', pixelColor);
-            strip[id].color = [pixel[0],pixel[1],pixel[2]];
+            strip[id].colxor = [pixel[0],pixel[1],pixel[2]];
             // update controls
             $('#rVal').val(pixel[0]);
             $('#gVal').val(pixel[1]);

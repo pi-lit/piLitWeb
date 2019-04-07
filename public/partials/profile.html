@@ -22,37 +22,26 @@
                             </div>
                         </div>
                     </div>
-
-                    <input type="text" id="startIndex" placeholder="Start Index">
-                    <input type="text" id="endIndex" placeholder="End Index">
-                    <input type="text" id="color" placeholder="Color">
-                    <input id="commandBtn" type="button" value="Send Command">
-                    <br>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div>
-                                
-                                <ul class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active"><a href="#createdConfigs" aria-controls="createdConfigs" role="tab" data-toggle="tab">Created Configs</a></li>
-                                    <li role="presentation"><a href="#savedConfigs" aria-controls="savedConfigs" role="tab" data-toggle="tab">SavedConfigs</a></li>
-                                </ul>
-                             
-                                <!-- Tab panes -->
-                                <div class="tab-content">
-                                    <div role="tabpanel" class="tab-pane active" id="createdConfigs">
-                                    </div>
-                                    <div role="tabpanel" class="tab-pane" id="savedConfigs">
-                                    </div>
-                                </div>
-                             
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
 
+            </div>
+
+
+            <!--Menu of bulbs-->
+            <div class="scrollmenu"></div>
+
+            <!-- colorpicker element -->
+            <div class="colorpicker" style="display:none;">
+              <canvas id="picker" var="5" width="300" height="300"></canvas>
+
+              <div class="controls">
+                    <div><label>R</label> <input type="text" id="rVal" /></div>
+                    <div><label>G</label> <input type="text" id="gVal" /></div>
+                    <div><label>B</label> <input type="text" id="bVal" /></div>
+                    <div><label>RGB</label> <input type="text" id="rgbVal" /></div>
+                    <div><label>HEX</label> <input type="text" id="hexVal" /></div>
+                    <div><label>Time</label> <input type="text" id="time" /></div>
+                </div>
             </div>
         </div>
     </div>
