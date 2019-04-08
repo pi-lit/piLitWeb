@@ -2,9 +2,6 @@
 
 html {
   background-color: #56baed;
-}
-
-body {
   font-family: "Poppins", sans-serif;
   height: 100vh;
 }
@@ -41,7 +38,7 @@ h2 {
   justify-content: center;
   width: 100%;
   min-height: 100%;
-  padding: 20px;
+  padding: 10px;
 }
 
 #formContent {
@@ -265,7 +262,7 @@ input[type=text]:placeholder {
 }
 
 #profileContent {
-  padding-top: 5em;
+  padding-top: 2em;
 }
 
 .image-container {
@@ -317,18 +314,23 @@ input[type=text]:placeholder {
     box-shadow: 20px 2px 2px #444444;
     color: #FFFFFF;
     font-size: 12px;
+    margin-top: 3em;
     position: absolute;
     width: 460px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 #picker {
     cursor: crosshair;
     float: left;
-    margin: 10px;
+    margin: .5em;
     border: 0;
 }
 .controls {
     float: right;
-    margin: 10px;
+    margin: .5em;
+    display: inline-block;
 }
 .controls > div {
     border: 1px solid #2F2F2F;
@@ -352,7 +354,7 @@ input[type=text]:placeholder {
     width: 75px;
 }
 div.scrollmenu {
-  background-color: #333;
+  margin-top: 3em;
   overflow: auto;
   white-space: nowrap;
 }
@@ -362,11 +364,20 @@ div.scrollmenu a {
   color: white;
   text-align: center;
   padding: 20px;
+  margin: .3em;
+  margin-top: .6em;
+  margin-bottom: .6em;
   text-decoration: none;
-  background-color: yellow;
-  border-radius: 50%;
+  background-color: black;
+  border-radius: 100%;
 }
 
 div.scrollmenu a:hover {
   background-color: #777;
 }
+
+.commands {
+  margin-top: 2em;
+}
+
+
