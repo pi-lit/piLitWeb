@@ -210,7 +210,7 @@ function saveConfig(username, strip) {
 }
 
 function applyConfig(username, strip) {
-	var range = $('#bulbRange').val().split("");
+	var range = $('#bulbRange').val().split(" ");
 	var effect = $('#effectName').val();
 	for(var i=0; i<range.length; i++) {
 		range[i] = +range[i]; 
