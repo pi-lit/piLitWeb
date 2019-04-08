@@ -24,8 +24,7 @@ $(function() {
 
 function connect() {
 
-	socket = io.connect("http://localhost:5000/");
-	//socket = io.connect("https://pi-lit.herokuapp.com");
+	socket = io.connect("https://pi-lit.herokuapp.com");
 
 	socket.on('login', function(user) {
 		if(user.error != "") {
@@ -79,7 +78,7 @@ function displayProfile(user) {
 	}
 	document.getElementById('applyConfigBtn').onclick = function() {
 		if(strip) {
-			applyConfig(user.userName, strip);
+			applyConfig(user, strip);
 		} else {
 			console.log("There is no strip present to save.");
 		}
@@ -209,7 +208,7 @@ function saveConfig(username, strip) {
 	return false;
 }
 
-function applyConfig(username, strip) {
+function applyConfig(user, strip) {
 	var range = $('#bulbRange').val().split(" ");
 	var effect = $('#effectName').val();
 	for(var i=0; i<range.length; i++) {
@@ -221,10 +220,11 @@ function applyConfig(username, strip) {
 	strip.color.g = strip[0].g;
 	strip.color.b = strip[0].b;
 	console.log(strip);
-	connect().emit('forwardCommand', {
-		'userName': username,
-		'configName': $('#configName').val(),
-		'command': strip
+	console.log(user.piList[0]);
+	var socket = io.connect("http://"+user.piList[0].address+":"+4000+"/");
+	socket.emit('command', {
+		'pi': {},
+		'config': strip
 	});
 	return false;
 }
