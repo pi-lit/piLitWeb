@@ -1,0 +1,54 @@
+body {
+    margin: 0;
+}
+
+header>h1 {
+    text-align: center;
+}
+
+section.led-ui {
+    border: 1px solid black;
+    width: 60%;
+    margin: 0 auto;
+}
+
+section.led-ui>div.led-rep, section.led-ui>div.controls, section.led-ui>div.controls>input, section.led-ui>div.controls>select, section.led-ui>div.controls>button {
+    display: flex;
+}
+
+section.led-ui>div.led-rep {
+    overflow: scroll;
+    white-space: nowrap;
+    display: block;
+    padding: 1rem;
+}
+
+section.led-ui>div.controls {
+    justify-content: center;
+    
+}
+
+.led {
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    margin-right: 0.5rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1rem;
+    cursor: pointer;
+}
+
+.uncolored {
+    background-color: #000;
+    color: #FFFFFF;
+}
+
+div.led:hover {
+    opacity: 0.6;
+}
+
+.selected {
+    opacity: 0.6;
+}
