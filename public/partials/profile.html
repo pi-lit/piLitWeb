@@ -26,33 +26,45 @@
 
 
             <!--Menu of bulbs-->
-            <div class="scrollmenu"></div>
-
-            <!-- colorpicker element -->
-            <div class="colorpicker" style="display:none;">
-                <canvas id="picker" var="5" width="300" height="300"></canvas>
-
+            <section class="led-ui">
+                <div class="led-rep">
+                </div>
                 <div class="controls">
-                    <div><label>R</label> <input type="text" id="rVal" /></div>
-                    <div><label>G</label> <input type="text" id="gVal" /></div>
-                    <div><label>B</label> <input type="text" id="bVal" /></div>
-                    <div><label>RGB</label> <input type="text" id="rgbVal" /></div>
-                    <div><label>HEX</label> <input type="text" id="hexVal" /></div>
-                    <div><label>Time</label> <input type="number" id="time" /></div>
-                    <div class="slidecontainer">
-                        <label>Brightness: </label><label id="brightnessVal"></label>
-                        <br>
-                        <input type="range" min="1" max="100" value="100" class="slider" id="myRange">
+                    <button type="button" id="configureBtn" data-toggle="modal" data-target="#myModal">Configure</button>
+                    <button type="button" id="save">Save</button>
+                </div>
+            </section>
+
+            <!-- The Modal -->
+            <div class="modal" id="myModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+
+                  <!-- Modal Header -->
+                    <div class="modal-header">
+                        <div id="selected-led-rep"></div>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                  <!-- Modal body -->
+                    <div class="modal-body">
+                        <input type="color" value="#0000ff" class="color-picker">
+                        <select name="effect" id="effect-selector">
+                            <option value="solid">Solid</option>
+                            <option value="flash">Flash</option>
+                            <option value="rainbow">Rainbow</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                  <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="applyBtn" data-dismiss='modal'>Apply</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+
                     </div>
                 </div>
-            </div>
-            <div class="commands">
-                <input type="text" id="bulbRange" name="bulbRange" placeholder="Bulb Range">
-                <input type="text" id="effectName" name="effectName" placeholder="Effect Name">
-                <input type="text" id="configName" name="configName" placeholder="Config Name">
-                <br>
-                <input type="button" class="btn btn-primary d-none" id="applyConfigBtn" value="Apply Config" />
-                <input type="button" class="btn btn-primary d-none" id="saveConfigBtn" value="Save Config" />
             </div>
         </div>
     </div>

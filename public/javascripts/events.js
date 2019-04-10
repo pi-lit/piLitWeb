@@ -1,3 +1,6 @@
+// LOGIC GLOBALS
+const ledList = [];
+
 var socket = {};
 
 $(function() {
@@ -57,6 +60,12 @@ function connect() {
 }
 
 function displayProfile(user) {
+	//Defining our buttons
+	let COLOR_PICKER = $('.color-picker');
+	let APPLY_BUTTON = $('#applyBtn');
+	let SAVE_BUTTON = $('#save');
+	COLOR_PICKER[0].addEventListener("change", watchColorPicker, false);
+	let ledNum = 30;
 
 	//Set bulbs and color wheel
 	//Populate user info
@@ -64,12 +73,29 @@ function displayProfile(user) {
 	document.getElementById('username').innerHTML = user.userName;
 	document.getElementById('password').innerHTML = user.password;
 	document.getElementById('email').innerHTML = user.email;
-	strip = setBulbs(1);
+	initLeds(ledNum);
+	addLedListeners();
+	$('#configureBtn').click(() => {
+		var selectRange = setConfigModal(ledNum);
+		APPLY_BUTTON.click(() => {
+	    	console.log(applySetting(selectRange));
+
+		});
+	});
 	document.getElementById('changeBulbBtn').onclick = function() {
 		var bulbCount = document.getElementById("bulbCount").value;
 		strip = setBulbs(bulbCount);
 	}
-	document.getElementById('saveConfigBtn').onclick = function() {
+	$('#myModal').on('hide.bs.modal', function (e) {
+		$('#selected-led-rep').empty();
+		for(let i=0; i<ledList.length; i++) {
+			if (ledList[i].data().selected === true) {
+                ledList[i].data('selected', false);
+                ledList[i].removeClass('selected');
+            }
+		}
+	});
+	/*document.getElementById('saveConfigBtn').onclick = function() {
 		if(strip) {
 			saveConfig(user.userName, strip);
 		} else {
@@ -82,7 +108,7 @@ function displayProfile(user) {
 		} else {
 			console.log("There is no strip present to save.");
 		}
-	}
+	}*/
 	/*document.getElementById('reset').onclick = function() {
 		reset(strip);
 	}*/
@@ -119,85 +145,6 @@ function displayProfile(user) {
 	*/
 }
 
-function setBulbs(bulbCount) {
-	//Reset scroll menu to be empty
-	$(".scrollmenu").empty();
-	for(var i=0; i<bulbCount; i++) {
-		$(".scrollmenu").append($("<a class = 'bulbs' id = '" + i + "'>"+ (i+1) + "</a>"));
-	}
-	//Reset strips
-	var strip = {effect: "solid", range: [], color:{}};
-	//Make strip variables
-	for(var i = 0; i<bulbCount;i++) {
-		var light = {};
-		light.r = 0;
-		light.g = 0;
-		light.b = 0;
-		light.time = 0;
-		light.brightness = 1;
-		strip[i] = light;
-	}
-	var bCanPreview = true; // can preview
-	// create canvas and context objects
-	var canvas = document.getElementById('picker');
-	var ctx = canvas.getContext('2d');
-	var id;
-	// drawing active image
-	var image = new Image();
-	image.onload = function() {
-	    ctx.drawImage(image, 0, 0, image.width, image.height); // draw the image on the canvas
-	}
-
-	var imageSrc = 'images/colorwheel5.png';
-	image.src = imageSrc;
-	$('#picker').mousemove(function(e) { // mouse move handler
-	    if (bCanPreview) {
-	        // get coordinates of current position
-	        var canvasOffset = $(canvas).offset();
-	        var canvasX = Math.floor(e.pageX - canvasOffset.left);
-	        var canvasY = Math.floor(e.pageY - canvasOffset.top);
-
-	        // get current pixel
-	        var imageData = ctx.getImageData(canvasX, canvasY, 1, 1);
-	        var pixel = imageData.data;
-
-	        var slider = document.getElementById("myRange");
-			var brightnessVal = document.getElementById("brightnessVal");
-			slider.oninput = function() {
-			  brightnessVal.innerHTML = this.value;
-			}
-
-	        // update preview color
-	        var pixelColor = "rgb("+pixel[0]+", "+pixel[1]+", "+pixel[2]+")";
-	        $('#'+id).css('background-color', pixelColor);
-	        strip[id].r = pixel[0];
-	        strip[id].g = pixel[1];
-	        strip[id].b = pixel[2];
-	        // update controls
-	        $('#rVal').val(pixel[0]);
-	        $('#gVal').val(pixel[1]);
-	        $('#bVal').val(pixel[2]);
-	        $('#rgbVal').val(pixel[0]+','+pixel[1]+','+pixel[2]);
-	        if($('#time').val !== undefined){
-	        	strip[id].time = $('#time').val();
-	        }
-
-	        var dColor = pixel[2] + 256 * pixel[1] + 65536 * pixel[0];
-	        $('#hexVal').val('#' + ('0000' + dColor.toString(16)).substr(-6));
-	    }
-	});
-	$('#picker').click(function(e) { // click event handler
-	    bCanPreview = !bCanPreview;
-	}); 
-	$('.bulbs').click(function(e) { // preview click
-	    $('.colorpicker').toggle("slow", "linear");
-	    id = this.id;
-	    bCanPreview = true;
-	    $('#time').val(0);
-	});
-	return strip;
-}
-
 function saveConfig(username, strip) {
 	console.log(strip);
 	connect().emit('saveConfig', {
@@ -219,7 +166,6 @@ function applyConfig(user, strip) {
 	strip.color.r = strip[0].r;
 	strip.color.g = strip[0].g;
 	strip.color.b = strip[0].b;
-	console.log(strip);
 	console.log(user.piList[0]);
 	var socket = io.connect("http://"+user.piList[0].address+":"+4000+"/");
 	socket.emit('command', {
@@ -227,4 +173,91 @@ function applyConfig(user, strip) {
 		'config': strip
 	});
 	return false;
+}
+
+//create led dom elements - add to the ledList array - append to LED_REP dom element
+function initLeds(ledNum) {
+    for (let i = 0; i < ledNum; i++) {
+        var led = $('<div class="led uncolored" id="led'+i+'">'+i+'</div>');
+        led.data('selected', false);
+        ledList.push(led);
+        $('.led-rep').append(led);
+    }
+}
+
+//add click listeners to led jQuery objects
+function addLedListeners() {
+    for (let i = 0; i < ledList.length; i++) {
+        ledList[i].click(() => {
+            //toggle selection
+            if (ledList[i].data().selected === false) {
+                ledList[i].data('selected', true);
+                ledList[i].addClass('selected');
+            } else {
+                ledList[i].data('selected', false);
+                ledList[i].removeClass('selected');
+            }
+        })
+    }
+}
+
+function setConfigModal(ledNum) {
+	let selectRange = [];
+    for (let i = 0; i < ledNum; i++) {
+        if (ledList[i].data().selected === true) {
+        	selectRange.push(i);
+            $('#selected-led-rep').append($(`<div class="led selected">${i}</div>`));
+        }
+    }
+    return selectRange;
+}
+
+//package the UI info into JSON format and send
+function applySetting(selectRange) {
+	console.log(selectRange);
+	let EFFECT_DROPDOWN = $('#effect-selector');
+	let COLOR_PICKER = $('.color-picker');
+    //JSON object to package as command
+    let commandObject  = {};
+    let currentEffect = EFFECT_DROPDOWN[0].options[EFFECT_DROPDOWN[0].selectedIndex].value;
+    
+    //value of html color input com in hex string so parse in hex for rgb vals in decimal
+    let r = parseInt(`${COLOR_PICKER[0].value[1]}${COLOR_PICKER[0].value[2]}`, 16);
+    let g = parseInt(`${COLOR_PICKER[0].value[3]}${COLOR_PICKER[0].value[4]}`, 16);
+    let b = parseInt(`${COLOR_PICKER[0].value[5]}${COLOR_PICKER[0].value[6]}`, 16);
+
+    //add everything to the command object
+    commandObject.range = selectRange;
+    commandObject.effect = currentEffect;
+    commandObject.color = {
+        r : r,
+        g : g,
+        b : b
+    }
+
+    //Change bulbs in main screen to the proper color
+    for(let i=0; i<selectRange.length; i++) {
+    	document.getElementById("led"+selectRange[i]).style.backgroundColor = COLOR_PICKER.value;
+    }
+
+    //clear current selections
+    clearSelected();
+    
+    //this is just a placeholder for an asynchronous command to the server over socket
+    return commandObject;
+
+}
+
+//run through all of the led's and "clear" the selections
+function clearSelected() {
+    ledList.forEach((ledObj) => {
+        ledObj.data('selected', false);
+        ledObj.removeClass('selected');
+    });
+}
+
+function watchColorPicker(event) {
+  document.querySelectorAll("[class^='led selected']").forEach(function(p) {
+    p.style.backgroundColor = event.target.value;
+  });
 }
