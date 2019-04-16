@@ -17,7 +17,7 @@
                             <div class="ml-auto">
                                 <input type="button" class="btn btn-primary d-none" id="logoutBtn" value="Log Out" />
                             </div>
-                            <input type="number" id="bulbCount" name="register" placeholder="Bulb Count">
+                            <input type="number" id="ledCount" name="register" placeholder="Led Count">
                             <input type="button" class="btn btn-primary d-none" id="changeBulbBtn" value="Change" />
                         </div>
                     </div>
@@ -35,6 +35,15 @@
                 </div>
             </section>
 
+            <!--<section class="group-list">
+                <div class="led-rep">
+                </div>
+                <div class="controls">
+                    <button type="button" id="configureBtn" data-toggle="modal" data-target="#myModal">Configure</button>
+                    <button type="button" id="save">Save</button>
+                </div>
+            </section>-->
+
             <!-- The Modal -->
             <div class="modal" id="myModal">
                 <div class="modal-dialog modal-dialog-centered">
@@ -43,7 +52,6 @@
                   <!-- Modal Header -->
                     <div class="modal-header">
                         <div id="selected-led-rep"></div>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
                   <!-- Modal body -->

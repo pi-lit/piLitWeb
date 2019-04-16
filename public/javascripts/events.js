@@ -60,31 +60,32 @@ function connect() {
 }
 
 function displayProfile(user) {
+	var commandList = [];
+	var strip = [];
+	var selectRange;
 	//Defining our buttons
 	let COLOR_PICKER = $('.color-picker');
-	let APPLY_BUTTON = $('#applyBtn');
 	let SAVE_BUTTON = $('#save');
 	COLOR_PICKER[0].addEventListener("change", watchColorPicker, false);
 	let ledNum = 30;
 
 	//Set bulbs and color wheel
 	//Populate user info
-	var strip = [];
 	document.getElementById('username').innerHTML = user.userName;
 	document.getElementById('password').innerHTML = user.password;
 	document.getElementById('email').innerHTML = user.email;
-	initLeds(ledNum);
+	strip = initLeds(ledNum);
 	addLedListeners();
 	$('#configureBtn').click(() => {
-		var selectRange = setConfigModal(ledNum);
-		APPLY_BUTTON.click(() => {
-	    	console.log(applySetting(selectRange));
-
-		});
+		selectRange = setConfigModal(ledNum);
+	});
+	$('#applyBtn').click(() => {
+	    createRangeSetting(commandList, selectRange);
+	    console.log(commandList);
 	});
 	document.getElementById('changeBulbBtn').onclick = function() {
-		var bulbCount = document.getElementById("bulbCount").value;
-		strip = setBulbs(bulbCount);
+		let ledCount = document.getElementById("ledCount").value;
+		strip = initLeds(ledCount);
 	}
 	$('#myModal').on('hide.bs.modal', function (e) {
 		$('#selected-led-rep').empty();
@@ -168,7 +169,8 @@ function applyConfig(user, strip) {
 	strip.color.b = strip[0].b;
 	console.log(user.piList[0]);
 	var socket = io.connect("http://"+user.piList[0].address+":"+4000+"/");
-	socket.emit('command', {
+	socket.emit('command', 
+	{
 		'pi': {},
 		'config': strip
 	});
@@ -177,6 +179,8 @@ function applyConfig(user, strip) {
 
 //create led dom elements - add to the ledList array - append to LED_REP dom element
 function initLeds(ledNum) {
+	//Clear the representation if anything is there
+	$('.led-rep').empty();
     for (let i = 0; i < ledNum; i++) {
         var led = $('<div class="led uncolored" id="led'+i+'">'+i+'</div>');
         led.data('selected', false);
@@ -206,15 +210,15 @@ function setConfigModal(ledNum) {
     for (let i = 0; i < ledNum; i++) {
         if (ledList[i].data().selected === true) {
         	selectRange.push(i);
-            $('#selected-led-rep').append($(`<div class="led selected">${i}</div>`));
+            $('#selected-led-rep').append($(`<div class="led selectedSub">${i}</div>`));
         }
     }
     return selectRange;
 }
 
 //package the UI info into JSON format and send
-function applySetting(selectRange) {
-	console.log(selectRange);
+function createRangeSetting(commandList, selectRange) {
+	console.log("createRangeSetting called!");
 	let EFFECT_DROPDOWN = $('#effect-selector');
 	let COLOR_PICKER = $('.color-picker');
     //JSON object to package as command
@@ -234,17 +238,17 @@ function applySetting(selectRange) {
         g : g,
         b : b
     }
+    let selected = $('.selected');
+    commandList.push(commandObject);
 
     //Change bulbs in main screen to the proper color
-    for(let i=0; i<selectRange.length; i++) {
-    	document.getElementById("led"+selectRange[i]).style.backgroundColor = COLOR_PICKER.value;
-    }
+    selected.css('background-color', 'rgb('+r+','+g+','+b+')');
 
     //clear current selections
     clearSelected();
-    
+
     //this is just a placeholder for an asynchronous command to the server over socket
-    return commandObject;
+    return;
 
 }
 
@@ -257,7 +261,7 @@ function clearSelected() {
 }
 
 function watchColorPicker(event) {
-  document.querySelectorAll("[class^='led selected']").forEach(function(p) {
+  document.querySelectorAll("[class^='led selectedSub']").forEach(function(p) {
     p.style.backgroundColor = event.target.value;
   });
 }
