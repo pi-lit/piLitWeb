@@ -1,0 +1,59 @@
+<ul class="nav nav-tabs mt-3">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#devices">Devices</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#configs">Configs</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div id="devices" class="tab-pane active border border-top-0 p-3">
+        <div class="row">
+            <div class="col-lg-6">
+                <form>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Device name..." required>
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button">New</button>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Description...">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="configs" class="tab-pane border border-top-0 p-3">
+        <div class="row">
+            <div class="col-lg-6">
+                <form id="configForm">
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <input id="configName" type="text" class="form-control" placeholder="Config name..." required>
+                            <div class="input-group-append">
+                                <button onclick="saveConfig()" class="btn btn-primary" type="button">New</button>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input id="configDescription" type="text" class="form-control" placeholder="Description...">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">Confirm delete</div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,6 +13,8 @@ html {
   font-weight: 400;
 }
 
+
+/*
 a:hover {
   text-decoration: none;
 }
@@ -26,6 +28,7 @@ h2 {
   margin: 40px 8px 10px 8px;
   color: #cccccc;
 }
+*/
 
 
 
@@ -68,6 +71,7 @@ h2 {
 
 /* TABS */
 
+/*
 h2.inactive {
   color: #cccccc;
 }
@@ -75,7 +79,8 @@ h2.inactive {
 h2.active {
   color: #0d0d0d;
   border-bottom: 2px solid #5fbae9;
-}
+}*
+*/
 
 
 
@@ -150,6 +155,7 @@ input[type=text]:placeholder {
 /* ANIMATIONS */
 
 /* Simple CSS3 Fade-in-down Animation */
+/*
 .fadeInDown {
   -webkit-animation-name: fadeInDown;
   animation-name: fadeInDown;
@@ -185,7 +191,7 @@ input[type=text]:placeholder {
   }
 }
 
-/* Simple CSS3 Fade-in Animation */
+/* Simple CSS3 Fade-in Animation
 @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 @-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
@@ -229,7 +235,7 @@ input[type=text]:placeholder {
   animation-delay: 1s;
 }
 
-/* Simple CSS3 Fade-in Animation */
+/* Simple CSS3 Fade-in Animation
 .underlineHover:after {
   display: block;
   left: 0;
@@ -248,7 +254,8 @@ input[type=text]:placeholder {
 .underlineHover:hover:after{
   width: 100%;
 }
-
+-->
+*/
 
 
 /* OTHERS */
@@ -265,6 +272,7 @@ input[type=text]:placeholder {
   padding-top: 2em;
 }
 
+/*
 .image-container {
   position: relative;
 }
@@ -277,6 +285,7 @@ input[type=text]:placeholder {
   transition: .5s ease;
   backface-visibility: hidden;
 }
+*/
 
 .middle {
   transition: .5s ease;
@@ -289,6 +298,7 @@ input[type=text]:placeholder {
   text-align: center;
 }
 
+/*
 .image-container:hover .image {
   opacity: 0.3;
 }
@@ -297,15 +307,13 @@ input[type=text]:placeholder {
   opacity: 1;
 }
 
-#profileContent {
-  padding-top: 4em;
-}
-
+/*
 .container {
     margin: 20px auto;
     text-align: justify;
     width: 600px;
 }
+*/
 
 /* colorpicker styles */
 
@@ -328,7 +336,7 @@ section.led-ui>div.led-rep {
 
 section.led-ui>div.controls {
     justify-content: center;
-    
+
 }
 
 .led {
