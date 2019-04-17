@@ -1,83 +1,14 @@
 // LOGIC GLOBALS
 const ledList = [];
-var profile;
-var socket;
-
+var tester = 0;
+var socket = {};
+var isOpen;
+var flashBol = false;
+var commandList = [];
 $(function() {
-	socket = io.connect("https://pi-lit.herokuapp.com");
-	//socket = io.connect("http://localhost:8080");
-
-	socket.on('login', function(user) {
-		if(user.error != "") {
-			document.getElementById('errormsg').innerHTML = user.error;
-		} else {
-			console.log(user);
-			profile = user;
-			$('#rootContent').load('/partials/navbar.html', function() {
-				$('#mainContent').load('/partials/home.html', displayHome);
-			});
-		}
-	});
-
-	//Handle register function
-	socket.on('register', function(user) {
-		if(user.error != "") {
-			document.getElementById('errormsg').innerHTML = user.error;
-		} else {
-			console.log(user);
-			$('#mainContent').load("/partials/profile.html", displayHome);
-		}
-	});
-
-	socket.on('savePublicConfig', function(res) {
-		if(res.error) {
-			console.log('error: cannot save public config : '+res.error);
-		} else {
-			console.log(res);
-
-			profile.configs.push(res);
-			$('#configs').append(new ConfigCard(res));
-		}
-	});
-
-	socket.on('getPublicConfigs', function(configs) {
-		if(configs.error) {
-			console.log('error loading marketplace: '+ configs.error);
-		} else {
-			console.log(configs);
-			for(var config of configs) {
-				$('#marketplace').append(new PublicConfigCard(config));
-			}
-		}
-	});
-
-	socket.on('deleteConfig', function(res) {
-		if(res.error) {
-			console.log('error: cannot delete config : '+res.error);
-		} else {
-			console.log(res);
-
-			profile.configs.filter(config => config._id == res._id);
-			$('#'+res._id).remove();
-		}
-	});
-
-	socket.on('saveConfig', function(res) {
-		if(res.error) {
-			console.log('error: cannot save config : '+res.error);
-		} else {
-			console.log(res);
-
-			if(!profile.configs.find(function(config){return config._id == res._id;})) {
-				profile.configs.push(res);
-				$('#configs').append(new ConfigCard(res));
-			}
-		}
-	});
-
 	//Call login when the login button is clicked
 	document.getElementById('loginBtn').onclick = function() {
-		socket.emit('login', {'userName': $('#username').val(),
+		connect().emit('login', {'userName': $('#username').val(),
 		'password': $('#password').val()} );
 		return false;
 	}
@@ -86,7 +17,7 @@ $(function() {
 	$('#registerDir').click(function(){
 		$('#mainContent').load("/partials/register.html", function() {
 			document.getElementById("registerBtn").onclick = function() {
-				socket.emit('register', {
+				connect().emit('register', {
 					'userName': $('#username').val(),
 					'password': $('#password').val(),
 					'email': $('#email').val()});
@@ -96,211 +27,104 @@ $(function() {
 	});
 });
 
-function displayHome() {
-	for(var pi of profile.piList)
-		$('#devices').append(new PiCard(pi));
+function connect() {
 
-	for(var config of profile.configs)
-		$('#configs').append(new ConfigCard(config));
+	socket = io.connect("https://pi-lit.herokuapp.com");
 
-	$('#confirmDeleteModal').on('show.bs.modal', function(event) {
-	    var config = $(event.relatedTarget).data('config');
-
-		$('#confirmDeleteModal').children()[0].children[0].children[1].children[1].onclick = function() {
-			$('#confirmDeleteModal').modal('hide');
-			socket.emit('deleteConfig', config);
+	socket.on('login', function(user) {
+		if(user.error != "") {
+			document.getElementById('errormsg').innerHTML = user.error;
+		} else {
+			console.log(user);
+			$('#mainContent').load("/partials/profile.html", () => {displayProfile(user)});
 		}
 	});
-}
 
-function logout() {
-	socket.disconnect();
-	window.location = "/index.html";
-}
-
-function displayProfile() {
-	$('#username').html(profile.userName);
-	$('#email').html(profile.email);
-	$('#name').html(profile.name);
-}
-
-function loadProfile() {
-	$('#mainContent').load('partials/profile.html', displayProfile);
-}
-
-function loadHome() {
-	$('#mainContent').load('partials/home.html', displayHome);
-}
-
-function loadMarketplace() {
-	$('#mainContent').load('partials/marketplace.html', function() {
-		socket.emit('getPublicConfigs', {});
-	});
-}
-
-function saveConfig() {
-	var config = {};
-
-	if(!$("#configForm")[0].checkValidity()) {
-		!$("#configForm")[0].reportValidity();
-		return;
-	}
-
-	config.userName = profile.userName;
-	config.configName = $("#configName").val();
-	config.description = $("#configDescription").val() || "Default description";
-	//config.description = $("#configDescription").val();
-	console.log($("#configDescription").val());
-	config.isPublic = false;
-
-	socket.emit('saveConfig', config);
-}
-
-function PublicConfigCard(config) {
-	var publicConfigCard = $(
-		'<div class="row flex">'+
-			'<div class="col-lg-7">'+
-				'<div class="card mb-2">'+
-				  '<h5 class="card-header">'+config.configName+'</h5>'+
-				  '<div class="card-body">'+
-					'<p class="card-text">'+config.description+'</p>'+
-					'<a class="btn btn-primary m-1">Save</a>'+
-					'<a class="btn btn-secondary m-1">View</a>'+
-				  '</div>'+
-				'</div>'+
-			'</div>'+
-		'</div>'
-	);
-
-	publicConfigCard.children()[0].children[0].children[1].children[1].onclick = function() {
-		socket.emit('savePublicConfig', config);
-	}
-
-	return publicConfigCard;
-}
-
-function ConfigCard(config) {
-	var checked = "";
-
-	if(config.isPublic) checked = "checked";
-
-	var configCard = $(
-		'<div class="row flex">'+
-			'<div class="col-lg-7">'+
-				'<div id="'+config._id+'" class="card mb-2">'+
-				  '<h5 class="card-header">'+config.configName+'</h5>'+
-				  '<div class="card-body">'+
-				    '<p class="card-text">'+config.description+'</p>'+
-					'<div class="row flex">'+
-						'<div class="col">'+
-							'<a href="#" class="btn btn-primary m-1">Edit</a>'+
-							'<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>'+
-						'</div>'+
-						'<div class="col">'+
-							'<input class="ml-auto" type="checkbox" id="publicCheckBox"'+checked+'>'+
-							'<label class="ml-auto" for="publicCheckBox">Public</label>'+
-						'</div>'+
-					'</div>'+
-				  '</div>'+
-				'</div>'+
-			'</div>'+
-		'</div>'
-	);
-
-	configCard.children()[0].children[0].children[1].children[1].children[1].children[0].onclick = function() {
-		config.isPublic = this.checked;
-		socket.emit('saveConfig', config);
-	}
-
-	var deleteButton = $(configCard.children()[0].children[0].children[1].children[1].children[0].children[1]);
-
-	deleteButton.data('config', config);
-
-	return configCard;
-}
-
-function PiCard(pi) {
-	var piCard = $(
-		'<div class="row flex">'+
-			'<div class="col-lg-7">'+
-				'<div class="card mb-2">'+
-				  '<h5 class="card-header">'+pi.piName+'</h5>'+
-				  '<div class="card-body">'+
-					'<p class="card-text">'+pi.description+'</p>'+
-					'<a href="#" class="btn btn-primary m-1">Configure</a>'+
-				  '</div>'+
-				'</div>'+
-			'</div>'+
-		'</div>'
-	);
-
-	return piCard;
-}
-
-/*
-//Defining our buttons
-let COLOR_PICKER = $('.color-picker');
-let APPLY_BUTTON = $('#applyBtn');
-let SAVE_BUTTON = $('#save');
-COLOR_PICKER[0].addEventListener("change", watchColorPicker, false);
-let ledNum = 30;
-
-//Set bulbs and color wheel
-//Populate user info
-var strip = [];
-initLeds(ledNum);
-addLedListeners();
-$('#configureBtn').click(() => {
-	var selectRange = setConfigModal(ledNum);
-	APPLY_BUTTON.click(() => {
-		console.log(applySetting(selectRange));
-
-	});
-});
-document.getElementById('changeBulbBtn').onclick = function() {
-	var bulbCount = document.getElementById("bulbCount").value;
-	strip = setBulbs(bulbCount);
-}
-$('#myModal').on('hide.bs.modal', function (e) {
-	$('#selected-led-rep').empty();
-	for(let i=0; i<ledList.length; i++) {
-		if (ledList[i].data().selected === true) {
-			ledList[i].data('selected', false);
-			ledList[i].removeClass('selected');
+	//Handle register function
+	socket.on('register', function(user) {
+		if(user.error != "") {
+			document.getElementById('errormsg').innerHTML = user.error;
+		} else {
+			console.log(user);
+			$('#mainContent').load("/partials/profile.html",  () => {displayProfile(user)});
 		}
-	}
-});
-*/
+	});
 
-/*
-document.getElementById('saveConfigBtn').onclick = function() {
-	if(strip) {
-		saveConfig(user.userName, strip);
-	} else {
-		console.log("There is no strip present to save.");
-	}
-}
-document.getElementById('applyConfigBtn').onclick = function() {
-	if(strip) {
-		applyConfig(user, strip);
-	} else {
-		console.log("There is no strip present to save.");
-	}
-}*/
-/*document.getElementById('reset').onclick = function() {
-	reset(strip);
+	socket.on('saveConfig', function(res) {
+		if(res.error != "") {
+			console.log('Received response');
+		} else {
+			console.log(res);
+		}
+	});
+
+	return socket;
 }
 
-document.getElementById('commandBtn').onclick = function() {
-	socket.emit('command', {'startIndex': $('#startIndex').val(),
-		'endIndex': $('#endIndex').val(),
-		'color': $('#color').val()});
-	return false;
+function displayProfile(user) {
+	//Defining our buttons
+	let COLOR_PICKER = $('.color-picker');
+	let APPLY_BUTTON = $('#applyBtn');
+	let SAVE_BUTTON = $('#save');
+	COLOR_PICKER[0].addEventListener("change", watchColorPicker, false);
+	let ledNum = 30;
+
+	//Set bulbs and color wheel
+	//Populate user info
+	var strip = [];
+	document.getElementById('username').innerHTML = user.userName;
+	document.getElementById('password').innerHTML = user.password;
+	document.getElementById('email').innerHTML = user.email;
+	initLeds(ledNum);
+	prevInitLeds(ledNum);
+	addLedListeners();
+	$('#configureBtn').click(() => {
+		var selectRange = setConfigModal(ledNum);
+		APPLY_BUTTON.click(() => {
+				commandList[tester] = applySetting(selectRange);
+				tester++;
+				console.log(commandList);
+				selectRange = 0;
+		});
+	});
+
+	document.getElementById('changeBulbBtn').onclick = function() {
+		var bulbCount = document.getElementById("bulbCount").value;
+		strip = setBulbs(bulbCount);
+	}
+	$('#myModal').on('hide.bs.modal', function (e) {
+		$('#selected-led-rep').empty();
+		for(let i=0; i<ledList.length; i++) {
+			if (ledList[i].data().selected === true) {
+                ledList[i].data('selected', false);
+                ledList[i].removeClass('selected');
+            }
+		}
+	});
+
+
+	$('#previewBtn').click(() => {
+		console.log("-----------here------------");
+		console.log(commandList);
+		$('#previewModal').on('show.bs.modal', function (e) {
+			previewLights(commandList);
+			console.log("hererere")
+			isOpen = true;
+			});
+		});
+		$('#previewModal').on('hide.bs.modal', function (e) {
+			isOpen = false;
+		});
+		if(isOpen == true){
+			previewLights(commandList);
+			console.log("madeit")
+		}
+
 }
 
 function saveConfig(username, strip) {
 	console.log(strip);
-	socket.emit('saveConfig', {
+	connect().emit('saveConfig', {
 		'userName': username,
 		'configName': $('#configName').val(),
 		'rpArray': strip
@@ -308,23 +132,6 @@ function saveConfig(username, strip) {
 	return false;
 }
 
-function applyConfig(user, strip) {
-	var range = $('#bulbRange').val().split(" ");
-	var effect = $('#effectName').val();
-	for(var i=0; i<range.length; i++) {
-		range[i] = +range[i];
-	}
-	strip.range = range;
-	strip.effect = effect;
-	strip.color.r = strip[0].r;
-	strip.color.g = strip[0].g;
-	strip.color.b = strip[0].b;
-	socket.emit('command', {
-		'pi': user.piList[0],
-		'config': strip
-	});
-	return false;
-}
 
 //create led dom elements - add to the ledList array - append to LED_REP dom element
 function initLeds(ledNum) {
@@ -333,6 +140,15 @@ function initLeds(ledNum) {
         led.data('selected', false);
         ledList.push(led);
         $('.led-rep').append(led);
+    }
+}
+//create previewled dom elements - add to the ledList array - append to LED_REP dom element
+function prevInitLeds(ledNum) {
+    for (let i = 0; i < ledNum; i++) {
+        var led = $('<div class="led uncolored" id="prevLed'+i+'">'+i+'</div>');
+        led.data('selected', false);
+        ledList.push(led);
+        $('.led-pre').append(led);
     }
 }
 
@@ -365,7 +181,6 @@ function setConfigModal(ledNum) {
 
 //package the UI info into JSON format and send
 function applySetting(selectRange) {
-	console.log(selectRange);
 	let EFFECT_DROPDOWN = $('#effect-selector');
 	let COLOR_PICKER = $('.color-picker');
     //JSON object to package as command
@@ -393,10 +208,9 @@ function applySetting(selectRange) {
 
     //clear current selections
     clearSelected();
-
     //this is just a placeholder for an asynchronous command to the server over socket
     return commandObject;
-
+		commandObject = {};
 }
 
 //run through all of the led's and "clear" the selections
@@ -412,4 +226,80 @@ function watchColorPicker(event) {
     p.style.backgroundColor = event.target.value;
   });
 }
-*/
+
+
+
+function interval(func, wait, times){
+    var interv = function(w, t){
+        return function(){
+            if(typeof t === "undefined" || t-- > 0){
+                setTimeout(interv, w);
+                try{
+                    func.call(null);
+                }
+                catch(e){
+                    t = 0;
+                    throw e.toString();
+                }
+            }
+        };
+    }(wait, times);
+
+    setTimeout(interv, wait);
+};
+
+
+function previewLights(list){
+	for(let i=0; i<list.length;i++){
+		switch(list[i].effect){
+		case "solid" :
+			changeColor(list[i].range,list[i].color);
+			break;
+		case "flash":
+				setInterval(function(){flash(list[i].range, list[i].color)},1000);
+			break;
+		case "rainbow":
+			break;
+		case "custom":
+		   setInterval(function(){custom(list[i].range,list[i].timestamp)})
+			break;
+		}
+	}
+}
+//changes the color of preview leds
+function changeColor(range,color){
+	for(let i=0;i<range.length;i++){
+		document.getElementById("prevLed"+range[i]).style.backgroundColor =
+		"rgb(" + color.r + "," + color.g + "," + color.b + ")";
+	}
+}
+
+function randomColor(){
+	var letters = '0123456789ABCDEF';
+	var color = '#'
+	for(let i=0;i<6;i++){
+		color += letters[Math.floor(Math.random()*16)];
+	}
+	return color;
+}
+function flash(range,color){
+		if(flashBol == true){
+		changeColor(range,color);
+		flashBol = !flashBol;
+	}
+	else{
+		changeColor(range,{r:0,g:0,b:0});
+		flashBol = !flashBol;
+	}
+}
+function custom(timestamp){
+	for(let i=o;i<timestamp.length;i++){
+		setTimeout(function(){setcColor(timestamp[i].range,timestamp[i].color)},1000);
+	}
+}
+function rainbow(range){
+	color = TODO 
+	for(let i=o;i<range.length;i++){
+		setTimeout(function(){setcColor(range[i], TODO some color )},1000);
+	}
+}
