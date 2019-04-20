@@ -1,10 +1,13 @@
 // LOGIC GLOBALS
 const ledList = [];
-var tester = 0;
+var tester = 0; // for building command array
+var timePosition = 0; // for building command array
 var socket = {};
-var isOpen;
 var flashBol = false;
 var commandList = [];
+var rainbowCounter = 0;
+var customCounter = 0;
+var blockerBol = true; // attemot to stop multiple button press
 $(function() {
 	//Call login when the login button is clicked
 	document.getElementById('loginBtn').onclick = function() {
@@ -66,6 +69,7 @@ function displayProfile(user) {
 	let COLOR_PICKER = $('.color-picker');
 	let APPLY_BUTTON = $('#applyBtn');
 	let SAVE_BUTTON = $('#save');
+	let TIME = $('#time-input');
 	COLOR_PICKER[0].addEventListener("change", watchColorPicker, false);
 	let ledNum = 30;
 
@@ -78,11 +82,20 @@ function displayProfile(user) {
 	initLeds(ledNum);
 	prevInitLeds(ledNum);
 	addLedListeners();
+
 	$('#configureBtn').click(() => {
 		var selectRange = setConfigModal(ledNum);
 		APPLY_BUTTON.click(() => {
+			console.log(TIME);
+				if (parseInt(TIME.val()) === 0){
 				commandList[tester] = applySetting(selectRange);
 				tester++;
+			}
+				if(TIME.val() > 0){
+					commandList[tester-1].timestamps[timePosition] = applySetting(selectRange);
+					timePosition++;
+					console.log("timestamps")
+				}
 				console.log(commandList);
 				selectRange = 0;
 		});
@@ -100,6 +113,9 @@ function displayProfile(user) {
                 ledList[i].removeClass('selected');
             }
 		}
+		TIME.val(0); // resets time to 0
+		timePosition = 0;
+		console.log("clear time")
 	});
 
 
@@ -107,18 +123,15 @@ function displayProfile(user) {
 		console.log("-----------here------------");
 		console.log(commandList);
 		$('#previewModal').on('show.bs.modal', function (e) {
-			previewLights(commandList);
-			console.log("hererere")
-			isOpen = true;
+			if(blockerBol){ // trying to prevent multiple calls
+				blockerBol = false;
+				previewLights(commandList);
+				}
 			});
 		});
 		$('#previewModal').on('hide.bs.modal', function (e) {
-			isOpen = false;
+			blockerBol = true;
 		});
-		if(isOpen == true){
-			previewLights(commandList);
-			console.log("madeit")
-		}
 
 }
 
@@ -183,8 +196,11 @@ function setConfigModal(ledNum) {
 function applySetting(selectRange) {
 	let EFFECT_DROPDOWN = $('#effect-selector');
 	let COLOR_PICKER = $('.color-picker');
+	let TIME = $('#time-input').val();
+	console.log(TIME);
     //JSON object to package as command
     let commandObject  = {};
+		let timestamps = [];
     let currentEffect = EFFECT_DROPDOWN[0].options[EFFECT_DROPDOWN[0].selectedIndex].value;
 
     //value of html color input com in hex string so parse in hex for rgb vals in decimal
@@ -193,6 +209,7 @@ function applySetting(selectRange) {
     let b = parseInt(`${COLOR_PICKER[0].value[5]}${COLOR_PICKER[0].value[6]}`, 16);
 
     //add everything to the command object
+		if(TIME == 0){
     commandObject.range = selectRange;
     commandObject.effect = currentEffect;
     commandObject.color = {
@@ -200,7 +217,16 @@ function applySetting(selectRange) {
         g : g,
         b : b
     }
-
+		commandObject.timestamps = timestamps;
+	 }
+	 else{
+	  timestamps.color = {
+        r : r,
+        g : g,
+        b : b
+    }
+		timestamps.time = TIME;
+	}
     //Change bulbs in main screen to the proper color
     for(let i=0; i<selectRange.length; i++) {
     	document.getElementById("led"+selectRange[i]).style.backgroundColor = COLOR_PICKER.value;
@@ -209,8 +235,14 @@ function applySetting(selectRange) {
     //clear current selections
     clearSelected();
     //this is just a placeholder for an asynchronous command to the server over socket
+		if (TIME == 0){
     return commandObject;
 		commandObject = {};
+		}
+		else{
+			return timestamps;
+			timestamps = [];
+		}
 }
 
 //run through all of the led's and "clear" the selections
@@ -250,21 +282,43 @@ function interval(func, wait, times){
 
 
 function previewLights(list){
+	let flashingBol = false;
+	let rainbowBol = false;
+	let customBol = false;
 	for(let i=0; i<list.length;i++){
 		switch(list[i].effect){
 		case "solid" :
-			changeColor(list[i].range,list[i].color);
+				changeColor(list[i].range,list[i].color);
+				solidBol = true;
 			break;
 		case "flash":
-				setInterval(function(){flash(list[i].range, list[i].color)},1000);
+				var flashing = setInterval(function(){flash(list[i].range, list[i].color)},1000);
+				flashingBol = true;
 			break;
 		case "rainbow":
+				var rainbowing = setInterval(function(){rainbow(list[i].range)},1000);
+				rainbowBol = true;
 			break;
 		case "custom":
-		   setInterval(function(){custom(list[i].range,list[i].timestamp)})
+		   var customing = setInterval(function(){custom(list[i].range,list[i].color,list[i].timestamps)},1000);
+			 customBol = true;
 			break;
 		}
 	}
+	$('#closeBtn').click(() => {
+		if(flashingBol){
+			clearInterval(flashing);
+			flashBol = false;
+		}
+		if(rainbowBol){
+			clearInterval(rainbowing);
+			rainbowCounter =0;
+		}
+		if(customBol){
+			clearInterval(customing);
+			customCounter =0;
+		}
+	});
 }
 //changes the color of preview leds
 function changeColor(range,color){
@@ -292,14 +346,35 @@ function flash(range,color){
 		flashBol = !flashBol;
 	}
 }
-function custom(timestamp){
-	for(let i=o;i<timestamp.length;i++){
-		setTimeout(function(){setcColor(timestamp[i].range,timestamp[i].color)},1000);
+
+function custom(range,color,times){
+	if(customCounter == 0){ // sets to initial color
+	  changeColor(range,color);
+		customCounter++;
+	}
+	else if ((customCounter) < 10) { // cycle through colors at time
+		for(let i=0;i<times.length;i++){
+			if( customCounter == times[i].time){
+				console.log(customCounter)
+				changeColor(range,times[i].color)
+			}
+	  }
+		customCounter++;
+	}
+	else{
+		customCounter = 0;
 	}
 }
 function rainbow(range){
-	color = TODO 
-	for(let i=o;i<range.length;i++){
-		setTimeout(function(){setcColor(range[i], TODO some color )},1000);
+	let colors = [{r: 255,g:0,b:0},{r:255,g:125,b:0},{r:250,g:235,b:0},{r:0,g:255,b:0},
+	{r:0,g:0,b:255},{r:150,g:0,b:255}];
+	if(rainbowCounter <= 5){
+		changeColor(range,colors[rainbowCounter]);
+		rainbowCounter++;
+		console.log(rainbowCounter)
+	 }
+	else{
+		rainbowCounter = 0;
+		changeColor(range,colors[rainbowCounter]);
+		}
 	}
-}
