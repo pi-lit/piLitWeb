@@ -1,0 +1,53 @@
+<div id="configEditor">
+    
+    <section align="center" class="majorControls">
+        <button class="btn btn-primary" type="button" id="configureBtn">Apply Existing Config</button>
+        <button class="btn btn-primary" type="button">Preview</button>
+    </section>
+
+    <section class="border border-primary rounded led-ui">
+        <div class="led-rep">
+        </div>
+    </section>
+
+    <section align="center" class="minorControls">
+        <button id="configBtn" class="btn btn-info" onclick="" type="button" data-toggle="modal" data-target="#myModal">Configure</button>
+        <button id="saveBtn" class="btn btn-info" type="button">Save</button>
+        <button id="sendBtn" class="btn btn-info" type="button">Send</button>
+    </section>
+
+</div>
+
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+      <!-- Modal Header -->
+        <div class="modal-header">
+            <div id="selected-led-rep"></div>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+      <!-- Modal body -->
+        <div align="center" class="modal-body">
+            <input type="color" value="#0000ff" class="color-picker">
+            <select name="effect" id="effect-selector">
+                <option value="solid">Solid</option>
+                <option value="flash">Flash</option>
+                <option value="rainbow">Rainbow</option>
+                <option value="custom">Custom</option>
+            </select>
+            <!--<section class="timestampCtrl">
+                <input type="number" placeholder="Time">
+                <input type="color" value="#0000ff" class="color-picker"></br>
+            </section>
+            <button type="button" class="addTimestamp btn-primary">Add Timestamp</button>
+        </div>-->
+
+      <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="applyRangeBtn" data-dismiss='modal'>Apply</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+</div>
