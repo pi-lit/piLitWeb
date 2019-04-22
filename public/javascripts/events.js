@@ -180,8 +180,8 @@ function displayConfig() {
     });
 
     //Listner for timestamps
-    $('#effect-selector').on('change', function(e) {
-    	if(e.target.options[e.target.selectedIndex].value = 'custom') {
+    $('#effect-selector').on('change', function() {
+    	if($('#effect-selector option:selected').val() == 'custom') {
     		$('.timestampCtrl').show();
     	} else {
     		$('.timestampCtrl').hide();
@@ -377,7 +377,7 @@ function createRangeSetting(commandList, selectRange) {
 	let COLOR_PICKER = $('.color-picker');
     //JSON object to package as command
     let commandObject  = {};
-    let currentEffect = EFFECT_DROPDOWN[0].options[EFFECT_DROPDOWN[0].selectedIndex].value;
+    let currentEffect = $('#effect-selector option:selected').val()
     if(currentEffect == 'custom') {
     	let timestamps = [];
     	let timestampValues = $('.timestampVals')
