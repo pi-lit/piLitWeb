@@ -203,6 +203,7 @@ function displayConfig() {
     //Modal close behavior
 	$('#myModal').on('hide.bs.modal', function (e) {
 		$('#selected-led-rep').empty();
+		$('.timestampCtrl').hide();
 		for(let i=0; i<ledList.length; i++) {
 			if (ledList[i].data().selected === true) {
                 ledList[i].data('selected', false);
