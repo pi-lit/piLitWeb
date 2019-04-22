@@ -369,4 +369,5 @@ div.led:hover {
 .timestampCtrl {
   margin-top: 1em;
   margin-bottom: 1em;
+  display: none;
 }

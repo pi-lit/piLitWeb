@@ -114,11 +114,18 @@ function displayHome() {
 
 	$('#confirmDeleteModal').on('show.bs.modal', function(event) {
 	    var config = $(event.relatedTarget).data('config');
+	    console.log(config);
 
 		$('#confirmDeleteModal').children()[0].children[0].children[1].children[1].onclick = function() {
 			$('#confirmDeleteModal').modal('hide');
 			socket.emit('deleteConfig', config);
 		}
+	});
+
+	$('.editConfigBtn').on('click', function(event) {
+		console.log(event);
+		var config = $(event.target).data('config');
+		console.log(config);
 	});
 }
 
@@ -172,6 +179,27 @@ function displayConfig() {
     	console.log(commandList);
     });
 
+    //Listner for timestamps
+    $('#effect-selector').on('change', function(e) {
+    	if(e.target.options[e.target.selectedIndex].value = 'custom') {
+    		$('.timestampCtrl').show();
+    	} else {
+    		$('.timestampCtrl').hide();
+    	}
+    });
+
+    $('.addTimestamp').click(() => {
+    	var timestamp = $(
+    		'<div class="timestampVals">'+
+    			'<input type="number" placeholder="Time">'+
+            	'<input type="color" value="#0000ff" class="color-picker"></br>'+
+            '</div>'
+    	)
+    	console.log(timestamp);
+
+    	timestamp.insertBefore($('.addTimestamp'));
+    });
+
     //Modal close behavior
 	$('#myModal').on('hide.bs.modal', function (e) {
 		$('#selected-led-rep').empty();
@@ -194,11 +222,13 @@ function displayConfig() {
     	socket.emit('command', command);
     });
 
+
     $('#saveBtn').click(() => {
     	let config = {};
     	config.userName = profile.userName;
-		config.configName = "New Config";
+		config.configName = profile.configs[2].configName;
 		config.commandArray = commandList;
+		config.ledNum = globalCon;
     	socket.emit('saveConfig', config);
     });
 }
@@ -246,7 +276,6 @@ function PublicConfigCard(config) {
 
 function ConfigCard(config) {
 	var checked = "";
-
 	if(config.isPublic) checked = "checked";
 
 	var configCard = $(
@@ -258,7 +287,7 @@ function ConfigCard(config) {
 				    '<p class="card-text">'+config.description+'</p>'+
 					'<div class="row flex">'+
 						'<div class="col">'+
-							'<a href="#" class="configBtn btn btn-primary m-1">Edit</a>'+
+							'<a href="#" onclick="loadViewEditConfig('+config.ledNum+')" class="editConfigBtn btn btn-primary m-1">Edit</a>'+
 							'<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>'+
 						'</div>'+
 						'<div class="col">'+
@@ -271,6 +300,7 @@ function ConfigCard(config) {
 			'</div>'+
 		'</div>'
 	);
+
 
 	configCard.children()[0].children[0].children[1].children[1].children[1].children[0].onclick = function() {
 		config.isPublic = this.checked;
@@ -348,6 +378,22 @@ function createRangeSetting(commandList, selectRange) {
     //JSON object to package as command
     let commandObject  = {};
     let currentEffect = EFFECT_DROPDOWN[0].options[EFFECT_DROPDOWN[0].selectedIndex].value;
+    if(currentEffect == 'custom') {
+    	let timestamps = [];
+    	let timestampValues = $('.timestampVals')
+    	for(let i=0; i<timestampValues.length; i++) {
+    		let individualValues = {};
+    		individualValues.time = timestampValues[i].children[0].value * 1000;
+    		console.log(timestampValues[i].children[1].value);
+		    let r = parseInt(`${timestampValues[i].children[1].value[1]}${timestampValues[i].children[1].value[2]}`, 16);
+		    let g = parseInt(`${timestampValues[i].children[1].value[3]}${timestampValues[i].children[1].value[4]}`, 16);
+		    let b = parseInt(`${timestampValues[i].children[1].value[5]}${timestampValues[i].children[1].value[6]}`, 16);
+		    let color = {r:r, g:g, b:b}
+		    individualValues.color = color;
+		    timestamps.push(individualValues);
+    	}
+    	commandObject.timestamps = timestamps;
+    }
     
     //value of html color input com in hex string so parse in hex for rgb vals in decimal
     let r = parseInt(`${COLOR_PICKER[0].value[1]}${COLOR_PICKER[0].value[2]}`, 16);
