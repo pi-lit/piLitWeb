@@ -5,8 +5,8 @@ var globalCon;
 var socket;
 
 $(function() {
-	socket = io.connect("https://pi-lit.herokuapp.com");
-	//socket = io.connect("http://localhost:8080");
+	//socket = io.connect("https://pi-lit.herokuapp.com");
+	socket = io.connect("http://localhost:8080");
 
 	socket.on('login', function(user) {
 		if(user.error != "") {
@@ -183,8 +183,10 @@ function displayConfig() {
     $('#effect-selector').on('change', function() {
     	if($('#effect-selector option:selected').val() == 'custom') {
     		$('.timestampCtrl').show();
+			$('#solidColorPicker').hide();
     	} else {
     		$('.timestampCtrl').hide();
+			$('#solidColorPicker').show();
     	}
     });
 
@@ -245,8 +247,6 @@ function saveConfig() {
 	config.userName = profile.userName;
 	config.configName = $("#configName").val();
 	config.description = $("#configDescription").val() || "Default description";
-	//config.description = $("#configDescription").val();
-	console.log($("#configDescription").val());
 	config.isPublic = false;
 
 	socket.emit('saveConfig', config);
@@ -301,7 +301,6 @@ function ConfigCard(config) {
 			'</div>'+
 		'</div>'
 	);
-
 
 	configCard.children()[0].children[0].children[1].children[1].children[1].children[0].onclick = function() {
 		config.isPublic = this.checked;
@@ -395,7 +394,7 @@ function createRangeSetting(commandList, selectRange) {
     	}
     	commandObject.timestamps = timestamps;
     }
-    
+
     //value of html color input com in hex string so parse in hex for rgb vals in decimal
     let r = parseInt(`${COLOR_PICKER[0].value[1]}${COLOR_PICKER[0].value[2]}`, 16);
     let g = parseInt(`${COLOR_PICKER[0].value[3]}${COLOR_PICKER[0].value[4]}`, 16);

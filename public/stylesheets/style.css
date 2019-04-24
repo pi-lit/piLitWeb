@@ -321,9 +321,11 @@ input[type=text]:placeholder {
 }
 
 section.led-ui {
+    /*
     width: 60%;
     margin: 0 auto;
     margin-top: 2em;
+    */
 }
 
 section.led-ui>div.led-rep, section.led-ui>div.controls, section.led-ui>div.controls>input, section.led-ui>div.controls>select, section.led-ui>div.controls>button {
@@ -331,10 +333,10 @@ section.led-ui>div.led-rep, section.led-ui>div.controls, section.led-ui>div.cont
 }
 
 section.led-ui>div.led-rep {
-    overflow: scroll;
+    /*overflow: scroll;
     white-space: nowrap;
     display: block;
-    padding: 1rem;
+    padding: 1rem;*/
 }
 
 .minorControls {
