@@ -1,12 +1,22 @@
 // LOGIC GLOBALS
-const ledList = [];
 var profile;
-var globalCon;
 var socket;
 
+const ledList = [];
+var globalCon;
+var tester = 0; // for building command array
+var timePosition = 0; // for building command array
+var flashBol = false;
+var commandList = [];
+var rainbowCounter = 0;
+var customCounter = 0;
+var blockerBol = true; // attemot to stop multiple button press
+
+var flashing = [], customing = [], rainbowing;
+
 $(function() {
-	//socket = io.connect("https://pi-lit.herokuapp.com");
-	socket = io.connect("http://localhost:8080");
+	socket = io.connect("https://pi-lit.herokuapp.com");
+	//socket = io.connect("http://localhost:8080");
 
 	socket.on('login', function(user) {
 		if(user.error != "") {
@@ -26,7 +36,13 @@ $(function() {
 			document.getElementById('errormsg').innerHTML = user.error;
 		} else {
 			console.log(user);
-			$('#mainContent').load("/partials/profile.html", displayHome);
+			user.piList = [];
+			user.configs = [];
+			profile = user;
+
+			$('#rootContent').load('/partials/navbar.html', function() {
+				$('#mainContent').load('/partials/home.html', displayHome);
+			});
 		}
 	});
 
@@ -93,14 +109,17 @@ $(function() {
 
 	//Load registration page
 	$('#registerDir').click(function(){
-		$('#mainContent').load("/partials/register.html", function() {
-			document.getElementById("registerBtn").onclick = function() {
+		$('#rootContent').load("/partials/register.html", function() {
+			$("#registerBtn").click(() => {
 				socket.emit('register', {
 					'userName': $('#username').val(),
 					'password': $('#password').val(),
-					'email': $('#email').val()});
+					'email': $('#email').val(),
+					'name': $('#name').val()
+				});
+
 				return false;
-			}
+			});
 		});
 	});
 });
@@ -123,9 +142,7 @@ function displayHome() {
 	});
 
 	$('.editConfigBtn').on('click', function(event) {
-		console.log(event);
 		var config = $(event.target).data('config');
-		console.log(config);
 	});
 }
 
@@ -154,29 +171,79 @@ function loadMarketplace() {
 	});
 }
 
-function loadViewEditConfig(config) {
-	globalCon = config;
-	$('#mainContent').load('partials/config.html', displayConfig);
+function loadViewConfigPi(pi) {
+	globalCon = pi.ledNum;
+	var piState = {commandArray:[]};
+
+	$('#mainContent').load('partials/configPi.html', ()=> {
+
+		$('#piName').html(pi.piName);
+
+		for(var config of profile.configs) {
+			$('#configDropDown').append(new ConfigDropDownItem(config));
+		}
+
+		//Send config
+	    $('#sendBtn').click(() => {
+	    	let command = {};
+			command.pi = pi;
+			console.log(commandList);
+			command.config = commandList;
+	    	socket.emit('command', command);
+	    });
+
+		$('#configEditor').load('partials/configEditor.html', ()=>{displayConfig(piState)});
+	});
 }
 
-function displayConfig() {
-	var commandList = [];
+function ConfigDropDownItem(config) {
+	var dropDownItem = $('<a class="dropdown-item">'+config.configName+'</a>');
+
+	dropDownItem.click(() => {
+		$('.led').css('background-color', 'black');
+		clearAllIntervals();
+		previewLights(config.commandArray);
+	});
+
+	return dropDownItem;
+}
+
+function loadViewEditConfig(config) {
+	globalCon = config.ledNum;
+
+	$('#mainContent').load('partials/config.html', ()=> {
+
+		$('#configName').html(config.configName);
+
+	    $('#saveBtn').click(() => {
+			config.commandArray = config.commandArray.concat(commandList);
+	    	socket.emit('saveConfig', config);
+	    });
+
+		$('#configEditor').load('partials/configEditor.html', ()=>{displayConfig(config)});
+	});
+}
+
+function displayConfig(config) {
+	commandList = [];
 	var selectRange;
 	initLeds(globalCon);
 	addLedListeners();
 
+	previewLights(config.commandArray);
+
 	//Color picker listeners
 	$('.color-picker')[0].addEventListener("change", watchColorPicker, false);
 
-	//Open config range modal
-	$('#configBtn').click(() => {
+	/*
+	$('#loadBtn').click(() => {
 		selectRange = setConfigModal(globalCon);
 	});
+	*/
 
 	//Apply a select range
 	$('#applyRangeBtn').click(() => {
-    	createRangeSetting(commandList, selectRange);
-    	console.log(commandList);
+    	createRangeSetting(commandList, findRange());
     });
 
     //Listner for timestamps
@@ -192,47 +259,13 @@ function displayConfig() {
 
     $('.addTimestamp').click(() => {
     	var timestamp = $(
-    		'<div class="timestampVals">'+
-    			'<input type="number" placeholder="Time">'+
-            	'<input type="color" value="#0000ff" class="color-picker"></br>'+
+			'<div class="row p-2 timestampVals">'+
+                '<input type="number" placeholder="Time" style="width: 100px; height: 35px">'+
+                '<input type="color" value="#0000ff" class="btn btn-outline-secondary" style="width: 100px; height: 35px">'+
             '</div>'
-    	)
-    	console.log(timestamp);
+    	);
 
-    	timestamp.insertBefore($('.addTimestamp'));
-    });
-
-    //Modal close behavior
-	$('#myModal').on('hide.bs.modal', function (e) {
-		$('#selected-led-rep').empty();
-		$('.timestampCtrl').hide();
-		for(let i=0; i<ledList.length; i++) {
-			if (ledList[i].data().selected === true) {
-                ledList[i].data('selected', false);
-                ledList[i].removeClass('selected');
-            }
-        }
-    });
-
-    //Send config
-    $('#sendBtn').click(() => {
-    	let pi = {}; let command = {};
-    	pi.userName = profile.userName;
-		pi.description = $("#configDescription").val() || "Default description";
-		pi.piName = profile.piList[0].piName;
-		command.pi = pi;
-		command.config = commandList;
-    	socket.emit('command', command);
-    });
-
-
-    $('#saveBtn').click(() => {
-    	let config = {};
-    	config.userName = profile.userName;
-		config.configName = profile.configs[2].configName;
-		config.commandArray = commandList;
-		config.ledNum = globalCon;
-    	socket.emit('saveConfig', config);
+    	timestamp.insertBefore($('.addTimestamp').parent());
     });
 }
 
@@ -247,6 +280,7 @@ function saveConfig() {
 	config.userName = profile.userName;
 	config.configName = $("#configName").val();
 	config.description = $("#configDescription").val() || "Default description";
+	config.ledNum = 30;
 	config.isPublic = false;
 
 	socket.emit('saveConfig', config);
@@ -260,8 +294,8 @@ function PublicConfigCard(config) {
 				  '<h5 class="card-header">'+config.configName+'</h5>'+
 				  '<div class="card-body">'+
 					'<p class="card-text">'+config.description+'</p>'+
-					'<a class="btn btn-primary m-1">Save</a>'+
-					'<a class="btn btn-secondary m-1">View</a>'+
+					'<button class="btn btn-primary m-1">Save</button>'+
+					'<button class="btn btn-secondary m-1" id="previewBtn" data-toggle="modal" data-target="#previewModal">View</button>'+
 				  '</div>'+
 				'</div>'+
 			'</div>'+
@@ -270,6 +304,13 @@ function PublicConfigCard(config) {
 
 	publicConfigCard.children()[0].children[0].children[1].children[1].onclick = function() {
 		socket.emit('savePublicConfig', config);
+	}
+
+	publicConfigCard.children()[0].children[0].children[1].children[2].onclick = function() {
+		$('#configName').html(config.configName);
+		$('.led-rep').html('');
+		initLeds(config.ledNum);
+		previewLights(config.commandArray);
 	}
 
 	return publicConfigCard;
@@ -288,7 +329,7 @@ function ConfigCard(config) {
 				    '<p class="card-text">'+config.description+'</p>'+
 					'<div class="row flex">'+
 						'<div class="col">'+
-							'<a href="#" onclick="loadViewEditConfig('+config.ledNum+')" class="editConfigBtn btn btn-primary m-1">Edit</a>'+
+							'<button class="editConfigBtn btn btn-primary m-1">Edit</button>'+
 							'<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>'+
 						'</div>'+
 						'<div class="col">'+
@@ -308,8 +349,10 @@ function ConfigCard(config) {
 	}
 
 	var deleteButton = $(configCard.children()[0].children[0].children[1].children[1].children[0].children[1]);
-
 	deleteButton.data('config', config);
+
+	var editButton = $(configCard.children()[0].children[0].children[1].children[1].children[0].children[0]);
+	editButton.click(()=>{loadViewEditConfig(config)});
 
 	return configCard;
 }
@@ -322,12 +365,18 @@ function PiCard(pi) {
 				  '<h5 class="card-header">'+pi.piName+'</h5>'+
 				  '<div class="card-body">'+
 					'<p class="card-text">'+pi.description+'</p>'+
-					'<a href="#" onclick="loadViewEditConfig('+pi.ledNum+')" class="btn btn-primary m-1">Configure</a>'+
+					'<button class="btn btn-primary m-1">Configure</button>'+
 				  '</div>'+
 				'</div>'+
 			'</div>'+
 		'</div>'
 	);
+
+	var configureBtn = $(piCard.children()[0].children[0].children[1].children[1]);
+
+	configureBtn.click(() => {
+		loadViewConfigPi(pi);
+	});
 
 	return piCard;
 }
@@ -351,22 +400,23 @@ function addLedListeners() {
             if (ledList[i].data().selected === false) {
                 ledList[i].data('selected', true);
                 ledList[i].addClass('selected');
+				console.log(ledList[i].data());
             } else {
                 ledList[i].data('selected', false);
                 ledList[i].removeClass('selected');
             }
-        })
+        });
     }
 }
 
-function setConfigModal(ledNum) {
+function findRange() {
 	let selectRange = [];
-    for (let i = 0; i < ledNum; i++) {
-        if (ledList[i].data().selected === true) {
-        	selectRange.push(i);
-            $('#selected-led-rep').append($(`<div class="led selectedSub">${i}</div>`));
-        }
+
+    for (var led of $('.selected')) {
+		console.log(led.innerHTML);
+        selectRange.push(parseInt(led.innerHTML));
     }
+
     return selectRange;
 }
 
@@ -383,7 +433,7 @@ function createRangeSetting(commandList, selectRange) {
     	let timestampValues = $('.timestampVals')
     	for(let i=0; i<timestampValues.length; i++) {
     		let individualValues = {};
-    		individualValues.time = timestampValues[i].children[0].value * 1000;
+    		individualValues.time = timestampValues[i].children[0].value;
     		console.log(timestampValues[i].children[1].value);
 		    let r = parseInt(`${timestampValues[i].children[1].value[1]}${timestampValues[i].children[1].value[2]}`, 16);
 		    let g = parseInt(`${timestampValues[i].children[1].value[3]}${timestampValues[i].children[1].value[4]}`, 16);
@@ -412,7 +462,8 @@ function createRangeSetting(commandList, selectRange) {
     commandList.push(commandObject);
 
     //Change bulbs in main screen to the proper color
-    selected.css('background-color', 'rgb('+r+','+g+','+b+')');
+    //selected.css('background-color', 'rgb('+r+','+g+','+b+')');
+	previewLights(commandList);
 
     //clear current selections
     clearSelected();
@@ -434,4 +485,153 @@ function watchColorPicker(event) {
   document.querySelectorAll("[class^='led selectedSub']").forEach(function(p) {
     p.style.backgroundColor = event.target.value;
   });
+}
+
+function clearAllIntervals(event) {
+	console.log('clear intervals');
+	for(var flasher of flashing) {
+		console.log(flasher);
+		clearInterval(flasher);
+	}
+
+	for(var customer of customing) {
+		console.log(customer);
+		clearTimeout(customer.timeout);
+	}
+
+	/*
+	if(rainbowing){
+		clearInterval(rainbowing);
+		rainbowing = undefined;
+		rainbowCounter = 0;
+	*/
+}
+
+function previewLights(list){
+	console.log("previewLights()");
+	console.log(list);
+
+	let flashingBol = false;
+	let rainbowBol = false;
+	let customBol = false;
+
+	flashing = [], customing = [], rainbowing;
+
+	$('#previewModal').on('hidden.bs.modal', clearAllIntervals);
+
+	for(let i=0; i<list.length;i++){
+		switch(list[i].effect){
+			case "solid" :
+				changeColor(list[i].range, list[i].color);
+				solidBol = true;
+			break;
+			case "flash":
+				flashing.push(Flasher(list[i].range, list[i].color));
+			break;
+			case "custom":
+				customing.push(Customer(list[i]));
+			break;
+			/*
+			case "rainbow":
+					rainbowing = setInterval(function(){rainbow(list[i].range)},1000);
+					rainbowBol = t() => {return Object.assign({}, config)};rue;
+				break;
+			*/
+		}
+	}
+}
+
+function Flasher(range, color) {
+	var flasher = {range: range, color: color, on: false};
+
+	var interval = setInterval(function() {
+		try {
+			flash(flasher.range, flasher.color, flasher);
+		} catch(e) {
+			clearInterval(interval);
+			return;
+		}
+	}, 1000);
+
+	interval.flasher = flasher;
+
+	return interval;
+}
+
+function Customer(commandObject) {
+	var customer = {timestamps: commandObject.timestamps, range: commandObject.range, i: 0};
+
+	console.log('Customer');
+
+	var timeout = setTimeout(() => {custom(customer)}, customer.timestamps[0].time);
+	customer.timeout = timeout;
+
+	return customer;
+}
+
+function custom(customer) {
+	try {
+		var i = customer.i;
+		var prev = 0;
+
+		changeColor(customer.range, customer.timestamps[i].color);
+
+		if(i == customer.timestamps.length - 1) {
+			i = 0;
+			prev = 0;
+		}
+		else {
+			prev = customer.timestamps[i].time;
+			i++;
+		}
+
+		customer.i = i;
+		customer.timeout = setTimeout(() => {custom(customer)}, customer.timestamps[i].time);
+	} catch(e) {
+		clearTimeout(customer.timeout);
+		return;
+	}
+}
+
+//changes the color of preview leds
+function changeColor(range,color){
+	for(let i=0;i<range.length;i++){
+		document.getElementById("led"+range[i]).style.backgroundColor =
+		"rgb(" + color.r + "," + color.g + "," + color.b + ")";
+	}
+}
+
+function randomColor(){
+	var letters = '0123456789ABCDEF';
+	var color = '#';
+	for(let i=0;i<6;i++){
+		color += letters[Math.floor(Math.random()*16)];
+	}
+	return color;
+}
+
+function flash(range,color, flasher){
+	if(flasher.on == true){
+		changeColor(range,color);
+	}
+	else{
+		changeColor(range,{r:0,g:0,b:0});
+	}
+
+	flasher.on = !flasher.on;
+}
+
+function rainbow(range) {
+	let colors = [{r: 255,g:0,b:0},{r:255,g:125,b:0},{r:250,g:235,b:0},{r:0,g:255,b:0},
+	{r:0,g:0,b:255},{r:150,g:0,b:255}];
+
+	if(rainbowCounter <= 5){
+		changeColor(range,colors[rainbowCounter]);
+		rainbowCounter++;
+		console.log(rainbowCounter)
+	}
+	else{
+		rainbowCounter = 0;
+		changeColor(range,colors[rainbowCounter]);
+	}
 }

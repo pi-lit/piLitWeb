@@ -1,0 +1,44 @@
+<div class="row">
+    <div class="col-md border-right">
+        <div class="row p-2 border-top border-bottom">
+            <h3 class="m-auto">Configure</h3>
+        </div>
+        <div class="row p-2">
+            <div class="my-auto">Effect:</div>
+            <div class="pl-5">
+                <select name="effect" id="effect-selector" class="custom-select" style="width: 100px; height: 35px">
+                    <option value="solid">Solid</option>
+                    <option value="flash">Flash</option>
+                    <option value="rainbow">Rainbow</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+        </div>
+        <div id="solidColorPicker" class="row p-2">
+            <div class="my-auto">Color:</div>
+            <div class="pl-5">
+                <input type="color" value="#0000ff" class="color-picker btn btn-outline-secondary" style="width: 100px; height: 35px">
+            </div>
+        </div>
+        <div class="timestampCtrl">
+            <div class="row p-2 timestampVals">
+                <input type="number" placeholder="Time" style="width: 100px; height: 35px">
+                <input type="color" value="#0000ff" class="btn btn-outline-secondary" style="width: 100px; height: 35px">
+            </div>
+            <div class="row p-2">
+                <button type="button" class="addTimestamp btn btn-secondary">Add</button>
+            </div>
+        </div>
+        <div class="row p-2">
+            <div class="ml-auto">
+                <button type="button" class="btn btn-primary" id="applyRangeBtn">Apply</button>
+            </div>
+        </div>
+    </div>
+    <div class="pt-3 col-lg border-top">
+        <section class="led-u">
+            <div class="led-rep">
+            </div>
+        </section>
+    </div>
+</div>
