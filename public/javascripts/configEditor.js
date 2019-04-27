@@ -13,12 +13,6 @@ function displayConfig(config) {
 	//Color picker listeners
 	$('.color-picker')[0].addEventListener("change", watchColorPicker, false);
 
-	/*
-	$('#loadBtn').click(() => {
-		selectRange = setConfigModal(globalCon);
-	});
-	*/
-
 	//Apply a select range
 	$('#applyRangeBtn').click(() => {
     	createRangeSetting(commandList, findRange());

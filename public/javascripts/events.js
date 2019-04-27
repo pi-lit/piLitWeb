@@ -3,8 +3,8 @@ var profile;
 var socket;
 
 $(function() {
-	socket = io.connect("https://pi-lit.herokuapp.com");
-	//socket = io.connect("http://localhost:8080");
+	//socket = io.connect("https://pi-lit.herokuapp.com");
+	socket = io.connect("http://localhost:8080");
 
 	socket.on('login', function(user) {
 		if(user.error != "") {
