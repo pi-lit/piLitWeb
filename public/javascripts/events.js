@@ -3,8 +3,8 @@ var profile;
 var socket;
 
 $(function() {
-	//socket = io.connect("https://pi-lit.herokuapp.com");
-	socket = io.connect("http://localhost:8080");
+	socket = io.connect("https://pi-lit.herokuapp.com");
+	//socket = io.connect("http://localhost:8080");
 
 	socket.on('login', function(user) {
 		if(user.error != "") {
@@ -31,6 +31,19 @@ $(function() {
 			$('#rootContent').load('/partials/navbar.html', function() {
 				$('#mainContent').load('/partials/home.html', displayHome);
 			});
+		}
+	});
+
+	socket.on('registerPi', function(res) {
+		if(res.error) {
+			console.log('error: cannot register pi : '+res.error);
+		} else {
+			console.log(res);
+
+			if(!profile.piList.find(function(pi){return pi._id == res._id;})) {
+				profile.piList.push(res);
+				$('#devices').append(new PiCard(res));
+			}
 		}
 	});
 

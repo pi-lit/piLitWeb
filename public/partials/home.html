@@ -11,15 +11,18 @@
     <div id="devices" class="tab-pane active p-3">
         <div class="row">
             <div class="col-lg-6">
-                <form>
+                <form id="registerPiForm">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Device name..." required>
+                        <input id="piName" type="text" class="form-control" placeholder="Device name..." required>
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">New</button>
+                            <button class="btn btn-primary" type="button" onclick="registerPi()">New</button>
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Description...">
+                        <input id="piDescription" type="text" class="form-control" placeholder="Description...">
+                    </div>
+                    <div class="input-group mb-3">
+                        <input id="macAddress" type="text" class="form-control" placeholder="MAC address..." required>
                     </div>
                 </form>
             </div>
